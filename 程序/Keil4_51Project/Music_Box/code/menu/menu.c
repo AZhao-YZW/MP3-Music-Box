@@ -6,12 +6,12 @@
 #include "menu/menu_builder.h"
 #include "musicplayer/mp_uart.h"
 
-// Oled菜单
+// Oled Menu
 static sMenu Menu[EndId] = {0};
-// 菜单位置记忆结构体
+// Menu position memory structure
 static sMenuLoc MenuLoc[MENU_MAX_LEVEL] = {0};
-// 菜单操作结构体
-//      - Keil C51编译器 仅支持C90语法和自身定义的一些拓展，结构体初始化只能按顺序
+// Menu operation structure
+//      - Keil C51 compiler only supports C90 syntax and some extensions, struct initialization must be sequential
 static sMenuOpt MenuOpt = {
     Menu,               // sMenu* menu;
     EndId,              // uint8_t endid;
@@ -21,15 +21,15 @@ static sMenuOpt MenuOpt = {
     MenuLoc,            // sMenuLoc* menuLoc;
     0,                  // uint8_t disFont;
 };
-// 空函数
+// Empty function
 static void x(){}
-// 菜单切换单个函数 - 便于按键注册
+// Menu switch single function - for easy key registration
 static void Menu_Pre()      {Menu_Switch(M_PRE);}
 static void Menu_Next()     {Menu_Switch(M_NEXT);}
 static void Menu_Ok()       {Menu_Switch(M_OK);}
 static void Menu_Back()     {Menu_Switch(M_BACK);}
 static void Menu_BackRoot() {Menu_Switch(M_BACKROOT);}
-// 本菜单功能按键注册
+// Register menu function keys
 void Menu_KeyRegister()
 {
     Key_Register(Menu_Back,BtnLL);
@@ -45,19 +45,19 @@ void Menu_KeyRegister()
     Key_Register(Menu_Ok,BtnRM);
 }
 
-// 菜单初始化
+// Menu initialization
 void Menu_Init()
 {
     uint8_t i;
 
-    //初始化目录元素   格式: (文件名语言,类型,层级,自身节点数,子节点数/调用函数/...,文件名)
-    i=0-1;  //使设置第一个元素时从i=0开始
+    // Initialize directory elements   Format: (language, type, level, self_node, son_node/func, name)
+    i=0-1;  // Make the first element start from i=0
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   0,  0,  3,                        "Main Menu");
 
-    /* 音乐播放器 - Music App */
+    /* Music Player */
     M_SETARGS(Menu, M_ASCII,  M_FILE,     1,  1,  MusicApp_Init,                "Music App");
 
-    /* Oled测试 */
+    /* Oled Test */
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   1,  2,  8,                            "Oled Test");
     M_SETARGS(Menu, M_ASCII,  M_FILE,     2,  1,  Oled_Dis_Test,                    "Display On/Off");
     M_SETARGS(Menu, M_ASCII,  M_FILE,     2,  2,  Oled_Color_Test,                  "Color");
@@ -69,7 +69,7 @@ void Menu_Init()
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   2,  8,  1,                                "System Test");
     M_SETARGS(Menu, M_ASCII,  M_FILE,     3,  1,  Oled_Menu_Test,                       "Oled Menu");
 
-    /* 菜单文件测试 */
+    /* Menu File Test */
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   1,  3,  3,                            "Folder Test");
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   2,  1,  2,                                "Folder A");
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   3,  1,  0,                                    "Folder a1");
@@ -88,44 +88,44 @@ void Menu_Init()
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   3,  7,  0,                                    "Folder c7");
     M_SETARGS(Menu, M_ASCII,  M_FOLDER,   3,  8,  0,                                    "Folder c8");
 
-    //按键功能映射
+    // Key function mapping
     Menu_KeyRegister();
-    //菜单显示
+    // Menu display
     Menu_Display();
-    //音乐播放器初始化，先暂停音乐
+    // MP3 player init, pause music first
     MPUart_Init();
 }
 
 
-// 菜单显示
+// Menu display
 void Menu_Display()
 {
     MenuBuilder_Display(&MenuOpt,Oled1);
 }
 
-// 菜单切换
-// scode: 切换操作
+// Menu switch
+// scode: switch operation
 void Menu_Switch(uint8_t scode)
 {
     switch(scode)
     {
-        /* 上一个 */
+        /* Previous */
         case M_PRE:
             MenuBuilder_Switch(&MenuOpt,Oled1,scode);
         break;
-        /* 下一个 */
+        /* Next */
         case M_NEXT:
             MenuBuilder_Switch(&MenuOpt,Oled1,scode);
         break;
-        /* 确认 */
+        /* Confirm */
         case M_OK:
             MenuBuilder_Switch(&MenuOpt,Oled1,scode);
         break;
-        /* 上一级 */
+        /* Back */
         case M_BACK:
             MenuBuilder_Switch(&MenuOpt,Oled1,scode);
         break;
-        /* 返回主菜单 */
+        /* Back to root */
         case M_BACKROOT:
             MenuBuilder_Switch(&MenuOpt,Oled1,scode);
         break;
